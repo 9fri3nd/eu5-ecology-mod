@@ -1,0 +1,209 @@
+﻿# Phenology state machine: crops respond to thermal and hydrological cues, not the calendar.
+#
+# eco_phenology_state: 0 = Dormant/Freeze, 1 = Active Growth, 2 = Fallow/Drought, 3 = Perpetual
+# eco_regime (seeded once): 1 = Thermal, 2 = Mediterranean & Arid, 3 = Monsoon, 4 = Equatorial
+#
+# Every transition that resets GDD is reachable TWO ways: environmental thresholds inside a
+# time-bounded window (early trigger), or a watchdog at the window's end (forced), plus the
+# global 12-month growth watchdog. No climate year can deadlock the cycle.
+
+# --- shared helpers ---
+
+eco_reset_gdd = {
+	set_variable = { name = eco_gdd_acc_wheat value = 0 }
+	set_variable = { name = eco_gdd_acc_rice value = 0 }
+	set_variable = { name = eco_gdd_acc_maize value = 0 }
+	set_variable = { name = eco_gdd_acc_millet value = 0 }
+	set_variable = { name = eco_gdd_acc_potato value = 0 }
+}
+
+eco_begin_growth = {
+	eco_reset_gdd = yes
+	set_variable = { name = eco_phenology_state value = 1 }
+	set_variable = { name = eco_growth_months_elapsed value = 0 }
+	set_variable = { name = eco_had_freeze value = 0 }
+}
+
+eco_enter_fallow = {
+	eco_reset_gdd = yes
+	set_variable = { name = eco_phenology_state value = 2 }
+	set_variable = { name = eco_growth_months_elapsed value = 0 }
+}
+
+# watchdog reset: 12 months of uninterrupted growth forces a harvest (state kept)
+eco_force_harvest_reset = {
+	eco_reset_gdd = yes
+	set_variable = { name = eco_growth_months_elapsed value = 0 }
+}
+
+# --- per-tick entry (province scope) ---
+
+eco_phenology_update = {
+	if = {
+		limit = { var:eco_temp_current < 0 }
+		set_variable = { name = eco_had_freeze value = 1 }
+	}
+	if = {
+		limit = { var:eco_phenology_state = 1 }
+		change_variable = { name = eco_growth_months_elapsed add = 1 }
+	}
+	# cycle duration guard: no active growth cycle may exceed 12 months without a reset
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			var:eco_growth_months_elapsed >= 12
+			NOT = { var:eco_regime = 4 }
+		}
+		eco_force_harvest_reset = yes
+	}
+	if = {
+		limit = { var:eco_regime = 1 }
+		eco_phenology_thermal = yes
+	}
+	else_if = {
+		limit = { var:eco_regime = 2 }
+		eco_phenology_fallow = yes
+	}
+	else_if = {
+		limit = { var:eco_regime = 3 }
+		eco_phenology_monsoon = yes
+	}
+	else = {
+		# regime 4: equatorial perpetual growth, state pinned
+		if = {
+			limit = { NOT = { var:eco_phenology_state = 3 } }
+			set_variable = { name = eco_phenology_state value = 3 }
+		}
+	}
+}
+
+# --- regime 1: frost-bound thermal cycle ---
+eco_phenology_thermal = {
+	# autumn freeze: lock the growing season; GDD holds its final value through dormancy
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			var:eco_temp_current < 0
+		}
+		set_variable = { name = eco_phenology_state value = 0 }
+	}
+	# spring thaw after a freezing winter, inside the thaw window (Mar-May N / Sep-Nov S)
+	if = {
+		limit = {
+			var:eco_phenology_state = 0
+			var:eco_had_freeze = 1
+			var:eco_temp_current > 5
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month >= 3 current_month <= 5 }
+				AND = { var:eco_hemisphere_sign = -1 current_month >= 9 current_month <= 11 }
+			}
+		}
+		eco_begin_growth = yes
+	}
+	# thaw watchdog: May (N) / November (S) forces the reset even without thaw/freeze cues
+	if = {
+		limit = {
+			var:eco_phenology_state = 0
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month = 5 }
+				AND = { var:eco_hemisphere_sign = -1 current_month = 11 }
+			}
+		}
+		eco_begin_growth = yes
+	}
+}
+
+# --- regime 2: mediterranean & arid summer fallow ---
+eco_phenology_fallow = {
+	# summer heat + drought conclude the grain harvest; window Jun-Aug N / Dec-Feb S
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			var:eco_temp_current > 22
+			var:eco_moisture < 35
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month >= 6 current_month <= 8 }
+				AND = { var:eco_hemisphere_sign = -1 OR = { current_month = 12 current_month <= 2 } }
+			}
+		}
+		eco_enter_fallow = yes
+	}
+	# window-end watchdog: the end of August (N) / February (S) forces harvest + fallow
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month = 8 }
+				AND = { var:eco_hemisphere_sign = -1 current_month = 2 }
+			}
+		}
+		eco_enter_fallow = yes
+	}
+	# autumn exit: rains return outside the fallow window, or October (N) / April (S) latest
+	if = {
+		limit = {
+			var:eco_phenology_state = 2
+			OR = {
+				AND = {
+					var:eco_moisture >= 40
+					NOT = { AND = { var:eco_hemisphere_sign = 1 current_month >= 6 current_month <= 8 } }
+					NOT = { AND = { var:eco_hemisphere_sign = -1 OR = { current_month = 12 current_month <= 2 } } }
+				}
+				AND = { var:eco_hemisphere_sign = 1 current_month = 10 }
+				AND = { var:eco_hemisphere_sign = -1 current_month = 4 }
+			}
+		}
+		set_variable = { name = eco_phenology_state value = 1 }
+		set_variable = { name = eco_growth_months_elapsed value = 0 }
+	}
+}
+
+# --- regime 3: tropical monsoon dual-harvest ---
+eco_phenology_monsoon = {
+	# monsoon onset: the rains begin the wet-season crop (May-Jul N / Nov-Jan S)
+	if = {
+		limit = {
+			NOT = { var:eco_phenology_state = 1 }
+			var:eco_moisture >= 65
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month >= 5 current_month <= 7 }
+				AND = { var:eco_hemisphere_sign = -1 OR = { current_month >= 11 current_month <= 1 } }
+			}
+		}
+		eco_begin_growth = yes
+	}
+	# onset watchdog: July (N) / January (S) forces the wet-season start
+	if = {
+		limit = {
+			NOT = { var:eco_phenology_state = 1 }
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month = 7 }
+				AND = { var:eco_hemisphere_sign = -1 current_month = 1 }
+			}
+		}
+		eco_begin_growth = yes
+	}
+	# monsoon withdrawal: harvest the wet-season crop, enter the dry state (Oct-Dec N / Apr-Jun S)
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			var:eco_moisture <= 45
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month >= 10 current_month <= 12 }
+				AND = { var:eco_hemisphere_sign = -1 current_month >= 4 current_month <= 6 }
+			}
+		}
+		eco_enter_fallow = yes
+	}
+	# withdrawal watchdog: December (N) / June (S) forces the second harvest
+	if = {
+		limit = {
+			var:eco_phenology_state = 1
+			OR = {
+				AND = { var:eco_hemisphere_sign = 1 current_month = 12 }
+				AND = { var:eco_hemisphere_sign = -1 current_month = 6 }
+			}
+		}
+		eco_enter_fallow = yes
+	}
+}

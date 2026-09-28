@@ -1,0 +1,44 @@
+﻿# Humidity tiers: applied mutually exclusively based on eco_tier_humidity.
+eco_humidity_tier_arid = {
+	game_data = {
+		category = province
+	}
+	eco_humidity_tier = 0
+	local_food_decay_modifier = -0.20
+	local_monthly_food_modifier = -0.05
+}
+
+eco_humidity_tier_dry = {
+	game_data = {
+		category = province
+	}
+	eco_humidity_tier = 1
+	local_food_decay_modifier = -0.10
+}
+
+eco_humidity_tier_balanced = {
+	game_data = {
+		category = province
+	}
+	eco_humidity_tier = 2
+	local_monthly_food_modifier = 0.02
+}
+
+eco_humidity_tier_humid = {
+	game_data = {
+		category = province
+	}
+	eco_humidity_tier = 3
+	local_food_decay_modifier = 0.10
+	local_disease_resistance = -0.02
+}
+
+eco_humidity_tier_wet = {
+	game_data = {
+		category = province
+	}
+	eco_humidity_tier = 4
+	local_food_decay_modifier = 0.25
+	local_disease_resistance = -0.05
+	local_rice_output_modifier = 0.05
+}

@@ -1,0 +1,57 @@
+﻿on_game_start = {
+	on_actions = {
+		eco_seed_world_on_action
+	}
+}
+
+on_game_load_after_lobby = {
+	on_actions = {
+		eco_seed_world_on_action
+	}
+}
+
+monthly_country_pulse = {
+	on_actions = {
+		eco_monthly_country_tick
+	}
+}
+
+# Benchmark hook: global monthly pulse, scope none. Drives/logs the 16 target provinces.
+weather_monthly_pulse = {
+	on_actions = {
+		eco_benchmark_monthly_pulse
+	}
+}
+
+eco_benchmark_monthly_pulse = {
+	trigger = {
+		has_game_rule = eco_rule_enabled
+		has_game_rule = eco_benchmark_enabled
+	}
+	effect = {
+		eco_benchmark_log_all = yes
+	}
+}
+
+eco_seed_world_on_action = {
+	trigger = {
+		has_game_rule = eco_rule_enabled
+	}
+	effect = {
+		eco_seed_world = yes
+	}
+}
+
+eco_monthly_country_tick = {
+	trigger = {
+		has_game_rule = eco_rule_enabled
+	}
+	effect = {
+		every_province = {
+			limit = {
+				eco_province_active = yes
+			}
+			eco_tick_province = yes
+		}
+	}
+}

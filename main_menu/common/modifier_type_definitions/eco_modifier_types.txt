@@ -1,0 +1,95 @@
+﻿eco_temperature = {
+	color = neutral
+	decimals = 1
+	game_data = {
+		category = location
+	}
+}
+
+eco_gdd = {
+	color = good
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_humidity = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_soil_health = {
+	color = good
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_erosion = {
+	color = bad
+	decimals = 1
+	game_data = {
+		category = location
+	}
+}
+
+eco_gdd_tier = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_soil_tier = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_humidity_tier = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_temp_tier = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_phenology_state = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_regime = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}
+
+eco_growth_elapsed = {
+	color = neutral
+	decimals = 0
+	game_data = {
+		category = location
+	}
+}

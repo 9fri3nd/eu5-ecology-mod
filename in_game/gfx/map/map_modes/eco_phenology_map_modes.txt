@@ -1,0 +1,75 @@
+# Phenology state map mode: paints every location by its province's current ecological
+# growing state (read via the cascading eco_metric_phenology carrier). Live verification
+# of the state machine - watch the map flip through the year.
+
+eco_phenology = {
+	map_color = {
+		if = {
+			limit = { is_ownable = no }
+			value = rgb { 128 128 128 }
+		}
+		else_if = {
+			limit = { modifier:eco_phenology_state < 0.5 }
+			value = rgb { 130 150 175 } # dormant: cold blue-grey
+		}
+		else_if = {
+			limit = { modifier:eco_phenology_state < 1.5 }
+			value = rgb { 70 160 70 } # active growth: green
+		}
+		else_if = {
+			limit = { modifier:eco_phenology_state < 2.5 }
+			value = rgb { 215 175 60 } # fallow/drought: amber
+		}
+		else = {
+			value = rgb { 45 190 170 } # perpetual: teal
+		}
+	}
+
+	legend_key = { desc = "MAPMODE_ECO_PHENOLOGY_DORMANT" color = rgb { 130 150 175 } }
+	legend_key = { desc = "MAPMODE_ECO_PHENOLOGY_GROWTH" color = rgb { 70 160 70 } }
+	legend_key = { desc = "MAPMODE_ECO_PHENOLOGY_FALLOW" color = rgb { 215 175 60 } }
+	legend_key = { desc = "MAPMODE_ECO_PHENOLOGY_PERPETUAL" color = rgb { 45 190 170 } }
+
+	tooltip_key = {
+		if = { limit = { is_ownable = yes } value = MAPMODE_ECO_PHENOLOGY_TT_LAND }
+		else = { value = MAPMODE_ECO_PHENOLOGY_TT_WATER }
+	}
+
+	small_map_names = location
+	medium_map_names = location
+	large_map_names = location
+
+	small_tooltip_context = location
+	medium_tooltip_context = location
+	large_tooltip_context = location
+
+	fill_in_impassable = yes
+	enable_snow = no
+
+	flatmap_behaviour = always
+	use_fow = no
+
+	category = geography
+	index = 1
+
+	map_markers = {
+		all = no
+	}
+
+	gradient_parameters = {
+		zoom_step = 2
+		gradient_alpha_inside = 0.9
+		gradient_alpha_outside = 0.9
+		gradient_width = 0.25
+		gradient_color_mult = 0.9
+		edge_width = 0
+		edge_sharpness = 0
+		edge_alpha = 0
+		edge_color_mult = 1
+		before_lighting_blend = 0.5
+		after_lighting_blend = 0.5
+	}
+
+	color_refresh_counters = { Month }
+	color_and_names_refresh_counters = { Month }
+}

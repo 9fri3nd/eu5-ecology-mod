@@ -1,0 +1,93 @@
+﻿# N-hemisphere cosine seasonal factor; flipped for southern hemisphere by eco_hemisphere_sign
+eco_seasonal_factor = {
+	if = {
+		limit = { current_month = 1 }
+		add = -1.0
+	}
+	else_if = {
+		limit = { current_month = 2 }
+		add = -0.86
+	}
+	else_if = {
+		limit = { current_month = 3 }
+		add = -0.5
+	}
+	else_if = {
+		limit = { current_month = 4 }
+		add = 0.0
+	}
+	else_if = {
+		limit = { current_month = 5 }
+		add = 0.5
+	}
+	else_if = {
+		limit = { current_month = 6 }
+		add = 0.86
+	}
+	else_if = {
+		limit = { current_month = 7 }
+		add = 1.0
+	}
+	else_if = {
+		limit = { current_month = 8 }
+		add = 0.86
+	}
+	else_if = {
+		limit = { current_month = 9 }
+		add = 0.5
+	}
+	else_if = {
+		limit = { current_month = 10 }
+		add = 0.0
+	}
+	else_if = {
+		limit = { current_month = 11 }
+		add = -0.5
+	}
+	else_if = {
+		limit = { current_month = 12 }
+		add = -0.86
+	}
+	multiply = var:eco_hemisphere_sign
+}
+
+eco_monthly_temperature = {
+	value = var:eco_temp_mean
+	add = {
+		desc = "ECO_SV_SEASONAL"
+		value = var:eco_temp_amplitude
+		multiply = eco_seasonal_factor
+	}
+	# annual random weather variance (+/-3 C), rolled once per growing year into a variable
+	add = {
+		desc = "ECO_SV_VARIANCE"
+		value = var:eco_weather_variance
+	}
+	# late-spring frost anomaly (May north / November south)
+	if = {
+		limit = { var:eco_anomaly = 1 var:eco_hemisphere_sign = 1 current_month = 5 }
+		add = { desc = "ECO_SV_LATE_FROST" value = -8 }
+	}
+	if = {
+		limit = { var:eco_anomaly = 1 var:eco_hemisphere_sign = -1 current_month = 11 }
+		add = { desc = "ECO_SV_LATE_FROST" value = -8 }
+	}
+	# scorching summer drought anomaly heat (Jul-Aug north / Jan-Feb south)
+	if = {
+		limit = { var:eco_anomaly = 2 var:eco_hemisphere_sign = 1 current_month >= 7 current_month <= 8 }
+		add = { desc = "ECO_SV_DROUGHT" value = 4 }
+	}
+	if = {
+		limit = { var:eco_anomaly = 2 var:eco_hemisphere_sign = -1 current_month >= 1 current_month <= 2 }
+		add = { desc = "ECO_SV_DROUGHT" value = 4 }
+	}
+}
+
+# rolled once per growing year by the tick; fixed_range re-rolls on EVERY evaluation,
+# so it must never be read directly outside the annual set_variable
+eco_roll_temp_variance = {
+	fixed_range = {
+		min = -3
+		max = 3
+	}
+}

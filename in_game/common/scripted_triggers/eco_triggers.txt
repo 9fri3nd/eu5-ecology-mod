@@ -1,0 +1,21 @@
+﻿eco_province_active = {
+	any_location_in_province = {
+		is_land = yes
+	}
+}
+
+eco_needs_seed = {
+	NOT = {
+		has_variable = eco_temp_mean
+	}
+}
+
+# true on provinces seeded before the volatility update (old saves):
+# dynamic vars must exist before any script value reads them (missing var: = 'none')
+eco_needs_dynamic_vars = {
+	NOT = {
+		has_variable = eco_weather_variance
+	}
+}
+
+# phenology state machine (eco_phenology.txt) drives all GDD resets now

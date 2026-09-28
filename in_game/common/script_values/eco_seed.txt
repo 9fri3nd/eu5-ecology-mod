@@ -1,0 +1,252 @@
+﻿# game-start geography seeding; province scope, climate read via capital location
+eco_seed_temp_mean = {
+	value = 10
+	if = {
+		limit = { capital ?= { climate = tropical } }
+		value = 27
+	}
+	else_if = {
+		limit = { capital ?= { climate = subtropical } }
+		value = 20
+	}
+	else_if = {
+		limit = { capital ?= { climate = oceanic } }
+		value = 11
+	}
+	else_if = {
+		limit = { capital ?= { climate = arid } }
+		value = 25
+	}
+	else_if = {
+		limit = { capital ?= { climate = cold_arid } }
+		value = 9
+	}
+	else_if = {
+		limit = { capital ?= { climate = mediterranean } }
+		value = 16
+	}
+	else_if = {
+		limit = { capital ?= { climate = continental } }
+		value = 7
+	}
+	else_if = {
+		limit = { capital ?= { climate = arctic } }
+		value = -10
+	}
+}
+
+eco_seed_amplitude = {
+	value = 8
+	if = {
+		limit = { capital ?= { climate = tropical } }
+		value = 3
+	}
+	else_if = {
+		limit = { capital ?= { climate = subtropical } }
+		value = 7
+	}
+	else_if = {
+		limit = { capital ?= { climate = oceanic } }
+		value = 8
+	}
+	else_if = {
+		limit = { capital ?= { climate = arid } }
+		value = 10
+	}
+	else_if = {
+		limit = { capital ?= { climate = cold_arid } }
+		value = 12
+	}
+	else_if = {
+		limit = { capital ?= { climate = mediterranean } }
+		value = 8
+	}
+	else_if = {
+		limit = { capital ?= { climate = continental } }
+		value = 14
+	}
+	else_if = {
+		limit = { capital ?= { climate = arctic } }
+		value = 12
+	}
+	if = {
+		limit = { any_location_in_province = { is_coastal = yes } }
+		multiply = 0.6
+	}
+}
+
+eco_seed_hemisphere = {
+	value = 1
+	if = {
+		limit = { capital ?= { hemisphere = southern } }
+		value = -1
+	}
+}
+
+eco_seed_humidity = {
+	value = 45
+	if = {
+		limit = { capital ?= { climate = tropical } }
+		value = 70
+	}
+	else_if = {
+		limit = { capital ?= { climate = subtropical } }
+		value = 55
+	}
+	else_if = {
+		limit = { capital ?= { climate = oceanic } }
+		value = 70
+	}
+	else_if = {
+		limit = { capital ?= { climate = arid } }
+		value = 15
+	}
+	else_if = {
+		limit = { capital ?= { climate = cold_arid } }
+		value = 25
+	}
+	else_if = {
+		limit = { capital ?= { climate = mediterranean } }
+		value = 45
+	}
+	else_if = {
+		limit = { capital ?= { climate = continental } }
+		value = 50
+	}
+	else_if = {
+		limit = { capital ?= { climate = arctic } }
+		value = 35
+	}
+	if = {
+		limit = { any_location_in_province = { is_coastal = yes } }
+		add = 15
+	}
+	if = {
+		limit = { any_location_in_province = { has_river = yes } }
+		add = 10
+	}
+	max = 100
+	min = 0
+}
+
+eco_seed_slope = {
+	value = 1.0
+	if = {
+		limit = { capital ?= { topography = hills } }
+		value = 1.8
+	}
+	else_if = {
+		limit = { capital ?= { topography = mountains } }
+		value = 3.0
+	}
+	else_if = {
+		limit = { capital ?= { topography = plateau } }
+		value = 1.6
+	}
+	else_if = {
+		limit = { capital ?= { topography = wetlands } }
+		value = 0.8
+	}
+}
+
+eco_seed_veg_cover = {
+	value = 0.3
+	if = {
+		limit = { capital ?= { vegetation = jungle } }
+		value = 1.0
+	}
+	else_if = {
+		limit = { capital ?= { vegetation = forest } }
+		value = 0.9
+	}
+	else_if = {
+		limit = { capital ?= { vegetation = woods } }
+		value = 0.75
+	}
+	else_if = {
+		limit = { capital ?= { vegetation = farmland } }
+		value = 0.4
+	}
+	else_if = {
+		limit = { capital ?= { vegetation = grasslands } }
+		value = 0.35
+	}
+	else_if = {
+		limit = { capital ?= { vegetation = sparse } }
+		value = 0.15
+	}
+}
+
+eco_seed_soil_max = {
+	value = 80
+	if = {
+		limit = { capital ?= { climate = tropical } }
+		value = 80
+	}
+	else_if = {
+		limit = { capital ?= { climate = subtropical } }
+		value = 90
+	}
+	else_if = {
+		limit = { capital ?= { climate = oceanic } }
+		value = 100
+	}
+	else_if = {
+		limit = { capital ?= { climate = arid } }
+		value = 40
+	}
+	else_if = {
+		limit = { capital ?= { climate = cold_arid } }
+		value = 50
+	}
+	else_if = {
+		limit = { capital ?= { climate = mediterranean } }
+		value = 100
+	}
+	else_if = {
+		limit = { capital ?= { climate = continental } }
+		value = 90
+	}
+	else_if = {
+		limit = { capital ?= { climate = arctic } }
+		value = 30
+	}
+}
+
+eco_seed_soil_start = {
+	value = eco_seed_soil_max
+	multiply = 0.8
+}
+
+# game-start province population; the fallow-regeneration feedback compares against this
+eco_seed_pop_baseline = {
+	desc = "ECO_SV_GEOGRAPHY"
+	value = population
+}
+
+# agricultural regime: 1 thermal (default), 2 mediterranean & arid, 3 monsoon, 4 equatorial
+eco_seed_regime = {
+	desc = "ECO_SV_GEOGRAPHY"
+	value = 1
+	if = {
+		limit = { capital ?= { climate = mediterranean } }
+		value = 2
+	}
+	if = {
+		limit = { capital ?= { climate = arid } }
+		value = 2
+	}
+	if = {
+		limit = { capital ?= { climate = subtropical } }
+		value = 3
+	}
+	if = {
+		limit = { capital ?= { climate = tropical } }
+		value = 3
+	}
+	# equatorial: tropical AND warm year-round (monthly temperature never near 20 C)
+	if = {
+		limit = { capital ?= { climate = tropical } var:eco_temp_mean >= 24 }
+		value = 4
+	}
+}

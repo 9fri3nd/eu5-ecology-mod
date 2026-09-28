@@ -1,0 +1,37 @@
+﻿# Icon registrations for the ecology display markers (custom art, DXT5 + full mip chain).
+eco_temperature = {
+	positive = "gfx/interface/icons/modifier_types/eco_temperature.dds"
+}
+eco_gdd = {
+	positive = "gfx/interface/icons/modifier_types/eco_gdd.dds"
+}
+eco_humidity = {
+	positive = "gfx/interface/icons/modifier_types/eco_humidity.dds"
+}
+eco_soil_health = {
+	positive = "gfx/interface/icons/modifier_types/eco_soil_health.dds"
+}
+eco_erosion = {
+	positive = "gfx/interface/icons/modifier_types/eco_erosion.dds"
+}
+eco_gdd_tier = {
+	positive = "gfx/interface/icons/modifier_types/eco_gdd.dds"
+}
+eco_soil_tier = {
+	positive = "gfx/interface/icons/modifier_types/eco_soil_health.dds"
+}
+eco_humidity_tier = {
+	positive = "gfx/interface/icons/modifier_types/eco_humidity.dds"
+}
+eco_temp_tier = {
+	positive = "gfx/interface/icons/modifier_types/eco_temperature.dds"
+}
+eco_phenology_state = {
+	positive = "gfx/interface/icons/modifier_types/eco_gdd.dds"
+}
+eco_regime = {
+	positive = "gfx/interface/icons/modifier_types/eco_gdd.dds"
+}
+eco_growth_elapsed = {
+	positive = "gfx/interface/icons/modifier_types/eco_gdd.dds"
+}

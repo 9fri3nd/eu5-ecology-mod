@@ -1,0 +1,112 @@
+﻿# tiers are cumulative if-adds; thresholds are fractions of each crop's GDD target
+eco_gdd_tier_value = {
+	value = 0
+	if = {
+		limit = {
+			OR = {
+				var:eco_gdd_acc_wheat >= 280
+				var:eco_gdd_acc_rice >= 440
+				var:eco_gdd_acc_maize >= 360
+				var:eco_gdd_acc_millet >= 320
+				var:eco_gdd_acc_potato >= 240
+			}
+		}
+		add = 1
+	}
+	if = {
+		limit = {
+			OR = {
+				var:eco_gdd_acc_wheat >= 700
+				var:eco_gdd_acc_rice >= 1100
+				var:eco_gdd_acc_maize >= 900
+				var:eco_gdd_acc_millet >= 800
+				var:eco_gdd_acc_potato >= 600
+			}
+		}
+		add = 1
+	}
+	if = {
+		limit = {
+			OR = {
+				var:eco_gdd_acc_wheat >= 1120
+				var:eco_gdd_acc_rice >= 1760
+				var:eco_gdd_acc_maize >= 1440
+				var:eco_gdd_acc_millet >= 1280
+				var:eco_gdd_acc_potato >= 960
+			}
+		}
+		add = 1
+	}
+	if = {
+		limit = {
+			OR = {
+				var:eco_gdd_acc_wheat >= 1400
+				var:eco_gdd_acc_rice >= 2200
+				var:eco_gdd_acc_maize >= 1800
+				var:eco_gdd_acc_millet >= 1600
+				var:eco_gdd_acc_potato >= 1200
+			}
+		}
+		add = 1
+	}
+}
+
+eco_soil_tier_value = {
+	value = 0
+	if = {
+		limit = { var:eco_soil_health >= 15 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_soil_health >= 35 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_soil_health >= 60 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_soil_health >= 85 }
+		add = 1
+	}
+}
+
+eco_humidity_tier_value = {
+	value = 0
+	if = {
+		limit = { var:eco_moisture >= 20 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_moisture >= 40 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_moisture >= 60 }
+		add = 1
+	}
+	if = {
+		limit = { var:eco_moisture >= 80 }
+		add = 1
+	}
+}
+
+eco_temp_tier_value = {
+	value = 2
+	if = {
+		limit = { var:eco_temp_current < -10 }
+		subtract = 2
+	}
+	else_if = {
+		limit = { var:eco_temp_current < 0 }
+		subtract = 1
+	}
+	else_if = {
+		limit = { var:eco_temp_current >= 35 }
+		add = 2
+	}
+	else_if = {
+		limit = { var:eco_temp_current >= 25 }
+		add = 1
+	}
+}

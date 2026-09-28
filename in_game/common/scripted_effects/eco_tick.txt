@@ -1,0 +1,254 @@
+﻿# Performance note: monthly work is province-scope only (sharded per country via
+# monthly_country_pulse -> every_province); location fan-out never happens on the
+# tick (location effects arrive via cascading static modifiers); tier swaps only
+# run when the computed tier actually changes.
+
+# Province scope.
+eco_tick_province = {
+	if = {
+		limit = {
+			eco_needs_seed = yes
+		}
+		eco_seed_province = yes
+	}
+	# save-upgrade guard: provinces seeded by an older mod version lack the
+	# volatility/fallow vars; initialize defaults before anything reads them
+	if = {
+		limit = {
+			eco_needs_dynamic_vars = yes
+		}
+		eco_init_dynamic_vars = yes
+	}
+	# phenology save-upgrade guard (provinces seeded before the state machine)
+	if = {
+		limit = {
+			NOT = { has_variable = eco_regime }
+		}
+		eco_seed_phenology = yes
+	}
+	set_variable = { name = eco_temp_current value = eco_monthly_temperature }
+	# ecological state machine: all GDD resets come from phenology, not the calendar
+	eco_phenology_update = yes
+	if = {
+		limit = {
+			OR = {
+				var:eco_phenology_state = 1
+				var:eco_phenology_state = 3
+			}
+		}
+		set_variable = { name = eco_growing_season value = 1 }
+	}
+	else = {
+		set_variable = { name = eco_growing_season value = 0 }
+	}
+	# annual weather roll, decoupled from phenology: every January for all provinces
+	# (stored in variables because fixed_range re-rolls per evaluation)
+	if = {
+		limit = {
+			current_month = 1
+		}
+		set_variable = { name = eco_weather_variance value = eco_roll_temp_variance }
+		set_variable = { name = eco_moisture_variance value = eco_roll_moisture_variance }
+		eco_roll_anomaly = yes
+	}
+	change_variable = { name = eco_gdd_acc_wheat add = eco_gdd_monthly_wheat }
+	change_variable = { name = eco_gdd_acc_rice add = eco_gdd_monthly_rice }
+	change_variable = { name = eco_gdd_acc_maize add = eco_gdd_monthly_maize }
+	change_variable = { name = eco_gdd_acc_millet add = eco_gdd_monthly_millet }
+	change_variable = { name = eco_gdd_acc_potato add = eco_gdd_monthly_potato }
+	# hard biological cap: GDD can never exceed 2500 (literal clamp bounds work; only
+	# script-value bounds are broken)
+	clamp_variable = { name = eco_gdd_acc_wheat min = 0 max = 2500 }
+	clamp_variable = { name = eco_gdd_acc_rice min = 0 max = 2500 }
+	clamp_variable = { name = eco_gdd_acc_maize min = 0 max = 2500 }
+	clamp_variable = { name = eco_gdd_acc_millet min = 0 max = 2500 }
+	clamp_variable = { name = eco_gdd_acc_potato min = 0 max = 2500 }
+	set_variable = { name = eco_moisture value = eco_moisture_index }
+	clamp_variable = { name = eco_moisture min = 0 max = 100 }
+	set_variable = { name = eco_erosion_rate value = eco_erosion_monthly }
+	change_variable = { name = eco_soil_health subtract = var:eco_erosion_rate }
+	change_variable = { name = eco_soil_health add = eco_soil_regen_monthly }
+	change_variable = { name = eco_soil_health add = eco_fallow_regen }
+	# clamp_variable with a script-value bound silently fails (confirmed: negative soil in saves);
+	# clamp via a capped script value instead
+	set_variable = { name = eco_soil_health value = eco_soil_health_capped }
+	# Continuous carriers: re-applied monthly with mode = replace + size = <script value>,
+	# the vanilla-proven dynamic-strength pattern (societal_value_push_*). Do NOT use
+	# change_province_modifier_size here: vanilla never calls it and it left sizes stuck at 1.
+	add_province_modifier = { modifier = eco_metric_temperature mode = replace size = eco_temperature_display }
+	add_province_modifier = { modifier = eco_metric_gdd mode = replace size = eco_gdd_display }
+	add_province_modifier = { modifier = eco_metric_humidity mode = replace size = eco_humidity_display }
+	add_province_modifier = { modifier = eco_metric_soil_health mode = replace size = eco_soil_display }
+	add_province_modifier = { modifier = eco_soil_capacity mode = replace size = eco_soil_capacity_delta }
+	add_province_modifier = { modifier = eco_metric_erosion mode = replace size = eco_erosion_display }
+	add_province_modifier = { modifier = eco_metric_phenology mode = replace size = eco_phenology_display }
+	add_province_modifier = { modifier = eco_metric_regime mode = replace size = eco_regime_display }
+	add_province_modifier = { modifier = eco_metric_elapsed mode = replace size = eco_elapsed_display }
+	eco_update_gdd_tier = yes
+	eco_update_soil_tier = yes
+	eco_update_humidity_tier = yes
+	eco_update_temp_tier = yes
+}
+
+eco_update_gdd_tier = {
+	save_temporary_scope_value_as = {
+		name = eco_new_tier
+		value = eco_gdd_tier_value
+	}
+	if = {
+		limit = {
+			NOT = { var:eco_tier_gdd = scope:eco_new_tier }
+		}
+		remove_province_modifier = eco_gdd_tier_dormant
+		remove_province_modifier = eco_gdd_tier_poor
+		remove_province_modifier = eco_gdd_tier_adequate
+		remove_province_modifier = eco_gdd_tier_good
+		remove_province_modifier = eco_gdd_tier_ideal
+		if = {
+			limit = { scope:eco_new_tier = 0 }
+			add_province_modifier = { modifier = eco_gdd_tier_dormant mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 1 }
+			add_province_modifier = { modifier = eco_gdd_tier_poor mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 2 }
+			add_province_modifier = { modifier = eco_gdd_tier_adequate mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 3 }
+			add_province_modifier = { modifier = eco_gdd_tier_good mode = replace }
+		}
+		else = {
+			add_province_modifier = { modifier = eco_gdd_tier_ideal mode = replace }
+		}
+		set_variable = { name = eco_tier_gdd value = scope:eco_new_tier }
+	}
+}
+
+eco_update_soil_tier = {
+	save_temporary_scope_value_as = {
+		name = eco_new_tier
+		value = eco_soil_tier_value
+	}
+	if = {
+		limit = {
+			NOT = { var:eco_tier_soil = scope:eco_new_tier }
+		}
+		remove_province_modifier = eco_soil_tier_depleted
+		remove_province_modifier = eco_soil_tier_poor
+		remove_province_modifier = eco_soil_tier_degraded
+		remove_province_modifier = eco_soil_tier_healthy
+		remove_province_modifier = eco_soil_tier_rich
+		if = {
+			limit = { scope:eco_new_tier = 0 }
+			add_province_modifier = { modifier = eco_soil_tier_depleted mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 1 }
+			add_province_modifier = { modifier = eco_soil_tier_poor mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 2 }
+			add_province_modifier = { modifier = eco_soil_tier_degraded mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 3 }
+			add_province_modifier = { modifier = eco_soil_tier_healthy mode = replace }
+		}
+		else = {
+			add_province_modifier = { modifier = eco_soil_tier_rich mode = replace }
+		}
+		set_variable = { name = eco_tier_soil value = scope:eco_new_tier }
+	}
+}
+
+eco_update_humidity_tier = {
+	save_temporary_scope_value_as = {
+		name = eco_new_tier
+		value = eco_humidity_tier_value
+	}
+	if = {
+		limit = {
+			NOT = { var:eco_tier_humidity = scope:eco_new_tier }
+		}
+		remove_province_modifier = eco_humidity_tier_arid
+		remove_province_modifier = eco_humidity_tier_dry
+		remove_province_modifier = eco_humidity_tier_balanced
+		remove_province_modifier = eco_humidity_tier_humid
+		remove_province_modifier = eco_humidity_tier_wet
+		if = {
+			limit = { scope:eco_new_tier = 0 }
+			add_province_modifier = { modifier = eco_humidity_tier_arid mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 1 }
+			add_province_modifier = { modifier = eco_humidity_tier_dry mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 2 }
+			add_province_modifier = { modifier = eco_humidity_tier_balanced mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 3 }
+			add_province_modifier = { modifier = eco_humidity_tier_humid mode = replace }
+		}
+		else = {
+			add_province_modifier = { modifier = eco_humidity_tier_wet mode = replace }
+		}
+		set_variable = { name = eco_tier_humidity value = scope:eco_new_tier }
+	}
+}
+
+eco_update_temp_tier = {
+	save_temporary_scope_value_as = {
+		name = eco_new_tier
+		value = eco_temp_tier_value
+	}
+	if = {
+		limit = {
+			NOT = { var:eco_tier_temp = scope:eco_new_tier }
+		}
+		remove_province_modifier = eco_temp_tier_deep_frost
+		remove_province_modifier = eco_temp_tier_cold
+		remove_province_modifier = eco_temp_tier_temperate
+		remove_province_modifier = eco_temp_tier_hot
+		remove_province_modifier = eco_temp_tier_scorching
+		if = {
+			limit = { scope:eco_new_tier = 0 }
+			add_province_modifier = { modifier = eco_temp_tier_deep_frost mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 1 }
+			add_province_modifier = { modifier = eco_temp_tier_cold mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 2 }
+			add_province_modifier = { modifier = eco_temp_tier_temperate mode = replace }
+		}
+		else_if = {
+			limit = { scope:eco_new_tier = 3 }
+			add_province_modifier = { modifier = eco_temp_tier_hot mode = replace }
+		}
+		else = {
+			add_province_modifier = { modifier = eco_temp_tier_scorching mode = replace }
+		}
+		set_variable = { name = eco_tier_temp value = scope:eco_new_tier }
+	}
+}
+
+# Annual anomaly roll: unseasonal late-spring frost (1) or scorching summer drought (2).
+eco_roll_anomaly = {
+	random_list = {
+		85 = {
+			set_variable = { name = eco_anomaly value = 0 }
+		}
+		8 = {
+			set_variable = { name = eco_anomaly value = 1 }
+		}
+		7 = {
+			set_variable = { name = eco_anomaly value = 2 }
+		}
+	}
+}

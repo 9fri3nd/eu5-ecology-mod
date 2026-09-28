@@ -1,0 +1,81 @@
+﻿
+# annual moisture variance factor (+/-15%), rolled once per growing year into a variable
+eco_roll_moisture_variance = {
+	fixed_range = {
+		min = -15
+		max = 15
+	}
+}
+
+eco_moisture_variance_factor = {
+	value = 1
+	add = {
+		desc = "ECO_SV_VARIANCE"
+		value = var:eco_moisture_variance
+		divide = 100
+	}
+	min = 0.5
+	max = 1.5
+}
+
+eco_moisture_index = {
+	value = var:eco_humidity_base
+	# tropical monsoon (Jun-Sep north / Dec-Mar south)
+	if = {
+		limit = { capital ?= { climate = tropical } var:eco_hemisphere_sign = 1 current_month >= 6 current_month <= 9 }
+		add = { desc = "ECO_SV_MONSOON" value = 20 }
+	}
+	if = {
+		limit = { capital ?= { climate = tropical } var:eco_hemisphere_sign = -1 OR = { current_month = 12 current_month <= 3 } }
+		add = { desc = "ECO_SV_MONSOON" value = 20 }
+	}
+	# mediterranean winter-wet (Nov-Feb north / May-Sep south)
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = 1 OR = { current_month >= 11 current_month <= 2 } }
+		add = { desc = "ECO_SV_MED_WINTER" value = 15 }
+	}
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = -1 current_month >= 5 current_month <= 9 }
+		add = { desc = "ECO_SV_MED_WINTER" value = 15 }
+	}
+	# mediterranean summer drought (Jun-Aug north / Dec-Feb south)
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = 1 current_month >= 6 current_month <= 8 }
+		subtract = { desc = "ECO_SV_MED_SUMMER" value = 10 }
+	}
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = -1 OR = { current_month = 12 current_month <= 2 } }
+		subtract = { desc = "ECO_SV_MED_SUMMER" value = 10 }
+	}
+	# mediterranean dry-fallow deepening (Jul-Aug north / Jan-Feb south): stacks with the summer row
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = 1 current_month >= 7 current_month <= 8 }
+		subtract = { desc = "ECO_SV_MED_FALLOW" value = 15 }
+	}
+	if = {
+		limit = { capital ?= { climate = mediterranean } var:eco_hemisphere_sign = -1 current_month >= 1 current_month <= 2 }
+		subtract = { desc = "ECO_SV_MED_FALLOW" value = 15 }
+	}
+	# continental summer rains (Jun-Aug north / Dec-Feb south)
+	if = {
+		limit = { capital ?= { climate = continental } var:eco_hemisphere_sign = 1 current_month >= 6 current_month <= 8 }
+		add = { desc = "ECO_SV_CONT_SUMMER" value = 10 }
+	}
+	if = {
+		limit = { capital ?= { climate = continental } var:eco_hemisphere_sign = -1 OR = { current_month = 12 current_month <= 2 } }
+		add = { desc = "ECO_SV_CONT_SUMMER" value = 10 }
+	}
+	# annual moisture variance
+	multiply = eco_moisture_variance_factor
+	# scorching-drought anomaly halves moisture in high summer
+	if = {
+		limit = { var:eco_anomaly = 2 var:eco_hemisphere_sign = 1 current_month >= 7 current_month <= 8 }
+		multiply = 0.5
+	}
+	if = {
+		limit = { var:eco_anomaly = 2 var:eco_hemisphere_sign = -1 current_month >= 1 current_month <= 2 }
+		multiply = 0.5
+	}
+	min = 0
+	max = 100
+}

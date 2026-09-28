@@ -1,0 +1,43 @@
+﻿# Benchmark driver for observer-mode runs (game rule eco_benchmark_rule).
+#
+# monthly_country_pulse only reaches OWNED land; the 18 benchmark targets include
+# wilderness, so this effect ticks their provinces from the global weather pulse.
+#
+# Data export: NOT via debug_log (engine-proven dead end: its text factory registers
+# neither GetVariable nor GetModifierValueFixed - only static text and globals).
+# Verification channels: the eco_phenology map mode (live) and savegame parsing
+# (verify_monthly.py) - the carriers eco_metric_* are readable from plain-text saves.
+
+eco_benchmark_log_all = {
+	eco_benchmark_tick_and_log = { LOC = paris }
+	eco_benchmark_tick_and_log = { LOC = london }
+	eco_benchmark_tick_and_log = { LOC = stockholm }
+	eco_benchmark_tick_and_log = { LOC = valladolid }
+	eco_benchmark_tick_and_log = { LOC = palermo }
+	eco_benchmark_tick_and_log = { LOC = arkhangelsk }
+	eco_benchmark_tick_and_log = { LOC = reikjavik }
+	eco_benchmark_tick_and_log = { LOC = novgorod }
+	eco_benchmark_tick_and_log = { LOC = samarkand }
+	eco_benchmark_tick_and_log = { LOC = cairo }
+	eco_benchmark_tick_and_log = { LOC = timbuktu }
+	eco_benchmark_tick_and_log = { LOC = sonargaon }
+	eco_benchmark_tick_and_log = { LOC = hangzhou }
+	eco_benchmark_tick_and_log = { LOC = malacca }
+	eco_benchmark_tick_and_log = { LOC = bern }
+	eco_benchmark_tick_and_log = { LOC = lhasa }
+	eco_benchmark_tick_and_log = { LOC = great_zimbabwe }
+	eco_benchmark_tick_and_log = { LOC = qusqu }
+}
+
+eco_benchmark_tick_and_log = {
+	location:$LOC$ = {
+		province = {
+			if = {
+				limit = {
+					NOT = { exists = owner }
+				}
+				eco_tick_province = yes
+			}
+		}
+	}
+}

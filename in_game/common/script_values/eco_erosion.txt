@@ -1,0 +1,74 @@
+﻿eco_land_pressure = {
+	desc = "ECO_SV_PRESSURE"
+	value = population
+	multiply = 0.02
+}
+
+eco_rain_erosivity = {
+	value = var:eco_moisture
+	divide = 100
+	max = 1
+	min = 0
+}
+
+eco_exposure = {
+	value = 1.1
+	subtract = var:eco_veg_cover
+	min = 0.1
+}
+
+eco_erosion_monthly = {
+	desc = "ECO_SV_EROSION"
+	value = eco_land_pressure
+	multiply = var:eco_slope_factor
+	multiply = eco_rain_erosivity
+	multiply = eco_exposure
+	# 44-year observer benchmark (1338-1381) showed dense farmland sterilizing in ~10 years
+	# at 0.2 (Paris 81->0, Palermo 76->0); 0.02 makes it a generational dynamic while
+	# over-pressured tropical farmland still degrades slowly
+	multiply = 0.02
+	min = 0
+}
+
+eco_soil_regen_monthly = {
+	desc = "ECO_SV_REGEN"
+	value = 0.4
+	multiply = var:eco_veg_cover
+}
+
+eco_soil_capacity_delta = {
+	value = var:eco_soil_health
+	subtract = 50
+	multiply = 0.8
+}
+
+eco_soil_max_sv = {
+	value = var:eco_soil_max
+}
+
+# population relative to the game-start baseline (1.0 = unchanged); guards empty provinces
+eco_pop_ratio = {
+	value = 1
+	if = {
+		limit = { var:eco_pop_baseline > 0 }
+		value = population
+		divide = var:eco_pop_baseline
+	}
+}
+
+# fallow/rewilding recovery: depopulated land (plague, war, famine) slowly regenerates soil,
+# +1.0/yr when abandoned fading linearly to 0 at 90% of the baseline population
+eco_fallow_regen = {
+	desc = "ECO_SV_FALLOW"
+	value = 0.9
+	subtract = eco_pop_ratio
+	min = 0
+	multiply = 0.1
+}
+
+# clamp helper: script-value max bounds work here (unlike clamp_variable)
+eco_soil_health_capped = {
+	value = var:eco_soil_health
+	max = eco_soil_max_sv
+	min = 0
+}

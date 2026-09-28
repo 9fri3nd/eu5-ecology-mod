@@ -1,0 +1,102 @@
+﻿eco_gdd_monthly_wheat = {
+	value = var:eco_temp_current
+	subtract = 4
+	min = 0
+	multiply = 30
+	multiply = var:eco_growing_season
+	multiply = eco_gdd_season_factor
+}
+
+eco_gdd_monthly_rice = {
+	value = var:eco_temp_current
+	subtract = 10
+	min = 0
+	multiply = 30
+	multiply = var:eco_growing_season
+	multiply = eco_gdd_season_factor
+}
+
+eco_gdd_monthly_maize = {
+	value = var:eco_temp_current
+	subtract = 8
+	min = 0
+	multiply = 30
+	multiply = var:eco_growing_season
+	multiply = eco_gdd_season_factor
+}
+
+eco_gdd_monthly_millet = {
+	value = var:eco_temp_current
+	subtract = 8
+	min = 0
+	multiply = 30
+	multiply = var:eco_growing_season
+	multiply = eco_gdd_season_factor
+}
+
+eco_gdd_monthly_potato = {
+	value = var:eco_temp_current
+	subtract = 5
+	min = 0
+	multiply = 30
+	multiply = var:eco_growing_season
+	multiply = eco_gdd_season_factor
+}
+
+eco_gdd_rel_wheat = {
+	value = var:eco_gdd_acc_wheat
+	divide = 1400
+	max = 1
+	min = 0
+}
+
+eco_gdd_rel_rice = {
+	value = var:eco_gdd_acc_rice
+	divide = 2200
+	max = 1
+	min = 0
+}
+
+eco_gdd_rel_maize = {
+	value = var:eco_gdd_acc_maize
+	divide = 1800
+	max = 1
+	min = 0
+}
+
+eco_gdd_rel_millet = {
+	value = var:eco_gdd_acc_millet
+	divide = 1600
+	max = 1
+	min = 0
+}
+
+eco_gdd_rel_potato = {
+	value = var:eco_gdd_acc_potato
+	divide = 1200
+	max = 1
+	min = 0
+}
+
+# chained mins raise the value to the highest operand -> max across crops
+eco_gdd_fulfillment = {
+	value = eco_gdd_rel_wheat
+	min = eco_gdd_rel_rice
+	min = eco_gdd_rel_maize
+	min = eco_gdd_rel_millet
+	min = eco_gdd_rel_potato
+}
+
+# State-driven growth factor (phenology state machine): dormant provinces do not grow,
+# fallow/drought provinces stall to a trickle. Replaces the old Mediterranean calendar rows.
+eco_gdd_season_factor = {
+	value = 1
+	if = {
+		limit = { var:eco_phenology_state = 0 }
+		value = 0
+	}
+	if = {
+		limit = { var:eco_phenology_state = 2 }
+		value = 0.1
+	}
+}

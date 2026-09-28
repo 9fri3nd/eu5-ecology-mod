@@ -1,0 +1,129 @@
+﻿# Ecology Simulation: inject a compact ecology summary row into the on-map location
+# hover card. Redefines vanilla `template tooltip_location_alt_content` (verbatim copy
+# of location_tooltips.gui plus the injected row); the zz_ prefix makes this file load
+# after the vanilla file so the later definition wins. Re-sync with vanilla on game patches.
+
+template tooltip_location_alt_content {
+    visible = "[Location.IsLand]"
+
+    TooltipTextBlock = {
+        visible = "[Location.IsOccupied]"
+        blockoverride "text" {
+            text = "LOCATION_TOOLTIP_OCCUPIED"
+            using = Font_Size_Medium
+        }
+    }
+
+    TooltipTextBlock = {
+        visible = "[Location.IsFrozen]"
+        blockoverride "text" {
+            text = "FROZEN_TOOLTIP"
+            using = Font_Size_Medium
+        }
+    }
+
+    TooltipStringPairList = {
+        visible = "[Location.HasWinter]"
+        textcontext = "[Location.GetWinterInfo]"
+    }
+
+    TooltipTextBlock = {
+        visible = "[And(Location.HasFortTooltip, HasAnyUnitsSelected)]"
+        blockoverride "text" {
+            text = "[Location.GetFortInfo]"
+        }
+    }
+
+    tooltipmeta = {
+        texture = "gfx/interface/icons/location_icons/attrition.dds"
+        game_concept = "[attrition|e]"
+    }
+    TooltipStringPairList = {
+        visible = "[HasAnyUnitsSelected]"
+        textcontext = "[Location.GetUnitsSelectedTooltipForLocation]"
+    }
+
+    # TooltipStringPairList = {
+    # 	textcontext = "[Location.GetTooltipBreakdownProperties]"
+    # }
+
+    location_geography_bar = {}
+    location_details = {}
+
+    # ECOLOGY & CLIMATE SUMMARY ROW (Ecology Simulation injection)
+    hbox = {
+        layoutpolicy_horizontal = expanding
+        margin = { 10 4 }
+        spacing = 12
+        visible = "[Not(HasAnyUnitsSelected)]"
+
+        hbox = { # temperature
+            spacing = 3
+            tooltip = "[ShowModifierTypeName('eco_temperature')]: [Localize('MODIFIER_TYPE_DESC_eco_temperature')]"
+            icon = { size = { 20 20 } texture = "gfx/interface/icons/modifier_types/eco_temperature.dds" }
+            text_single = { autoresize = yes align = left
+                raw_text = "[Location.GetModifierValue('eco_temperature')]" }
+        }
+        hbox = { # humidity
+            spacing = 3
+            tooltip = "[ShowModifierTypeName('eco_humidity')]: [Localize('MODIFIER_TYPE_DESC_eco_humidity')]"
+            icon = { size = { 20 20 } texture = "gfx/interface/icons/modifier_types/eco_humidity.dds" }
+            text_single = { autoresize = yes align = left
+                raw_text = "[Location.GetModifierValue('eco_humidity')]" }
+        }
+        hbox = { # growing degree days
+            spacing = 3
+            tooltip = "[ShowModifierTypeName('eco_gdd')]: [Localize('MODIFIER_TYPE_DESC_eco_gdd')]"
+            icon = { size = { 20 20 } texture = "gfx/interface/icons/modifier_types/eco_gdd.dds" }
+            text_single = { autoresize = yes align = left
+                raw_text = "[Location.GetModifierValue('eco_gdd')|0]" }
+        }
+        hbox = { # soil health
+            spacing = 3
+            tooltip = "[ShowModifierTypeName('eco_soil_health')]: [Localize('MODIFIER_TYPE_DESC_eco_soil_health')]"
+            icon = { size = { 20 20 } texture = "gfx/interface/icons/modifier_types/eco_soil_health.dds" }
+            text_single = { autoresize = yes align = left
+                raw_text = "[Location.GetModifierValue('eco_soil_health')|0]" }
+        }
+    }
+
+    TooltipListBase = {
+        visible = "[And(Location.HasSpecificBaseModifier, Not(HasAnyUnitsSelected))]"
+
+        TooltipManualTableField = { # SPECIFIC MODIFIERS
+            tooltipwidget = {
+                using = raw_good_location_modifier_tooltip
+            }
+
+            text_single = {
+                layoutpolicy_horizontal = expanding
+                text = "[location_modifier|e]"
+            }
+
+
+            icon = {
+                size = { 27 27 }
+                texture = "[Location.GetSpecificBaseModifier.GetModifier.GetIcon]"
+
+                glow = {
+                    glow_radius = 3
+                    color = {0.0 0.0 0.0 1.0}
+                    alpha = 0.5
+                }
+            }
+
+            text_single = {
+                text = "[Location.GetSpecificBaseModifier.GetName|L]"
+                fontsize = 15
+                using = FontDefaultColor
+            }
+        }
+    }
+
+    TooltipFlavorTextBlock = {
+        visible = "[And(Location.HasFlavorText, Not(HasAnyUnitsSelected))]"
+        blockoverride "text" {
+            text = "[Location.GetFlavorText]"
+        }
+    }
+}

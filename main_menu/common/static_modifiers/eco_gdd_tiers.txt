@@ -1,0 +1,64 @@
+﻿# GDD tiers: applied mutually exclusively by the monthly tick based on eco_tier_gdd.
+eco_gdd_tier_dormant = {
+	game_data = {
+		category = province
+	}
+	eco_gdd_tier = 0
+	local_wheat_output_modifier = -0.30
+	local_rice_output_modifier = -0.30
+	local_maize_output_modifier = -0.30
+	local_millet_output_modifier = -0.30
+	local_potato_output_modifier = -0.30
+	local_monthly_food_modifier = -0.10
+}
+
+eco_gdd_tier_poor = {
+	game_data = {
+		category = province
+	}
+	eco_gdd_tier = 1
+	local_wheat_output_modifier = -0.15
+	local_rice_output_modifier = -0.15
+	local_maize_output_modifier = -0.15
+	local_millet_output_modifier = -0.15
+	local_potato_output_modifier = -0.15
+	local_monthly_food_modifier = -0.05
+}
+
+eco_gdd_tier_adequate = {
+	game_data = {
+		category = province
+	}
+	eco_gdd_tier = 2
+	local_wheat_output_modifier = -0.05
+	local_rice_output_modifier = -0.05
+	local_maize_output_modifier = -0.05
+	local_millet_output_modifier = -0.05
+	local_potato_output_modifier = -0.05
+}
+
+eco_gdd_tier_good = {
+	game_data = {
+		category = province
+	}
+	eco_gdd_tier = 3
+	local_wheat_output_modifier = 0.10
+	local_rice_output_modifier = 0.10
+	local_maize_output_modifier = 0.10
+	local_millet_output_modifier = 0.10
+	local_potato_output_modifier = 0.10
+	local_monthly_food_modifier = 0.05
+}
+
+eco_gdd_tier_ideal = {
+	game_data = {
+		category = province
+	}
+	eco_gdd_tier = 4
+	local_wheat_output_modifier = 0.20
+	local_rice_output_modifier = 0.20
+	local_maize_output_modifier = 0.20
+	local_millet_output_modifier = 0.20
+	local_potato_output_modifier = 0.20
+	local_monthly_food_modifier = 0.10
+}

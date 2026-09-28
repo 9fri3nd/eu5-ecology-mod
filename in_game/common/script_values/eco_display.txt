@@ -1,0 +1,41 @@
+﻿eco_temperature_display = {
+	value = var:eco_temp_current
+}
+
+# chained mins raise the value to the highest accumulator -> max across crops
+eco_gdd_display = {
+	value = var:eco_gdd_acc_wheat
+	min = var:eco_gdd_acc_rice
+	min = var:eco_gdd_acc_maize
+	min = var:eco_gdd_acc_millet
+	min = var:eco_gdd_acc_potato
+	round = yes
+}
+
+eco_humidity_display = {
+	value = var:eco_moisture
+	round = yes
+}
+
+eco_soil_display = {
+	value = var:eco_soil_health
+	round = yes
+}
+
+# annualized erosion rate for display (monthly rate x 12)
+eco_erosion_display = {
+	value = var:eco_erosion_rate
+	multiply = 12
+}
+
+eco_phenology_display = {
+	value = var:eco_phenology_state
+}
+
+eco_regime_display = {
+	value = var:eco_regime
+}
+
+eco_elapsed_display = {
+	value = var:eco_growth_months_elapsed
+}

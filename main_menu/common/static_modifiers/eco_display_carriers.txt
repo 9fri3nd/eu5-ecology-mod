@@ -1,0 +1,68 @@
+﻿# Permanent display carriers. The monthly tick re-applies each with
+# mode = replace and size = <display script value>, so each holds exactly ONE key.
+eco_metric_temperature = {
+	game_data = {
+		category = province
+	}
+	eco_temperature = 1
+}
+
+eco_metric_gdd = {
+	game_data = {
+		category = province
+	}
+	eco_gdd = 1
+}
+
+eco_metric_humidity = {
+	game_data = {
+		category = province
+	}
+	eco_humidity = 1
+}
+
+eco_metric_soil_health = {
+	game_data = {
+		category = province
+	}
+	eco_soil_health = 1
+}
+
+# Soil health feeds food capacity permanently; sized by eco_soil_capacity_delta (-40..+40).
+eco_soil_capacity = {
+	game_data = {
+		category = province
+	}
+	local_food_capacity = 1
+}
+
+# Erosion risk readout; sized by eco_erosion_display (annualized rate).
+eco_metric_erosion = {
+	game_data = {
+		category = province
+	}
+	eco_erosion = 1
+}
+
+# Phenology state readout; sized by eco_phenology_display (0 dormant, 1 growth, 2 fallow, 3 perpetual).
+eco_metric_phenology = {
+	game_data = {
+		category = province
+	}
+	eco_phenology_state = 1
+}
+
+# Benchmark logger readouts: agricultural regime and growth-cycle watchdog counter.
+eco_metric_regime = {
+	game_data = {
+		category = province
+	}
+	eco_regime = 1
+}
+
+eco_metric_elapsed = {
+	game_data = {
+		category = province
+	}
+	eco_growth_elapsed = 1
+}

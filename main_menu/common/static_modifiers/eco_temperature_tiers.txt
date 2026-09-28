@@ -1,0 +1,47 @@
+﻿# Temperature tiers: applied mutually exclusively based on eco_tier_temp.
+eco_temp_tier_deep_frost = {
+	game_data = {
+		category = province
+	}
+	eco_temp_tier = 0
+	local_army_attrition = 2
+	local_supply_limit_modifier = -0.30
+	local_monthly_food_modifier = -0.20
+	local_population_growth = -0.002
+}
+
+eco_temp_tier_cold = {
+	game_data = {
+		category = province
+	}
+	eco_temp_tier = 1
+	local_army_attrition = 1
+	local_monthly_food_modifier = -0.10
+}
+
+eco_temp_tier_temperate = {
+	game_data = {
+		category = province
+	}
+	eco_temp_tier = 2
+	local_monthly_food_modifier = 0.02
+}
+
+eco_temp_tier_hot = {
+	game_data = {
+		category = province
+	}
+	eco_temp_tier = 3
+	local_food_decay = 0.001
+	local_monthly_food_modifier = -0.05
+}
+
+eco_temp_tier_scorching = {
+	game_data = {
+		category = province
+	}
+	eco_temp_tier = 4
+	local_army_attrition = 1
+	local_food_decay = 0.002
+	local_monthly_food_modifier = -0.10
+}

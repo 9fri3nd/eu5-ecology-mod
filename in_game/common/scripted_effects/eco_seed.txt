@@ -1,0 +1,91 @@
+﻿eco_seed_world = {
+	every_area = {
+		every_province_in_area = {
+			limit = {
+				eco_province_active = yes
+			}
+			eco_seed_province = yes
+		}
+	}
+}
+
+# Dynamic-state defaults. Must run BEFORE anything computes eco_monthly_temperature /
+# eco_moisture_index (they read the variance/anomaly vars; a missing var: read in
+# arithmetic evaluates to 'none' and logs a script-value error).
+# Called by eco_seed_province and by the monthly tick as a save-upgrade guard.
+eco_init_dynamic_vars = {
+	set_variable = { name = eco_weather_variance value = 0 }
+	set_variable = { name = eco_moisture_variance value = 0 }
+	set_variable = { name = eco_anomaly value = 0 }
+	set_variable = { name = eco_pop_baseline value = eco_seed_pop_baseline }
+	set_variable = { name = eco_growing_season value = 0 }
+	set_variable = { name = eco_erosion_rate value = 0 }
+	set_variable = { name = eco_gdd_acc_wheat value = 0 }
+	set_variable = { name = eco_gdd_acc_rice value = 0 }
+	set_variable = { name = eco_gdd_acc_maize value = 0 }
+	set_variable = { name = eco_gdd_acc_millet value = 0 }
+	set_variable = { name = eco_gdd_acc_potato value = 0 }
+	# -1 forces the first tick to apply tier modifiers
+	set_variable = { name = eco_tier_gdd value = -1 }
+	set_variable = { name = eco_tier_soil value = -1 }
+	set_variable = { name = eco_tier_humidity value = -1 }
+	set_variable = { name = eco_tier_temp value = -1 }
+}
+
+# Province scope. Idempotent: only runs on unseeded provinces.
+eco_seed_province = {
+	if = {
+		limit = {
+			eco_needs_seed = yes
+		}
+		# 1. geography constants
+		set_variable = { name = eco_temp_mean value = eco_seed_temp_mean }
+		set_variable = { name = eco_temp_amplitude value = eco_seed_amplitude }
+		set_variable = { name = eco_hemisphere_sign value = eco_seed_hemisphere }
+		set_variable = { name = eco_humidity_base value = eco_seed_humidity }
+		set_variable = { name = eco_slope_factor value = eco_seed_slope }
+		set_variable = { name = eco_veg_cover value = eco_seed_veg_cover }
+		set_variable = { name = eco_soil_max value = eco_seed_soil_max }
+		# 2. dynamic-state defaults (before any computed value that reads them)
+		eco_init_dynamic_vars = yes
+		# 3. computed starting state
+		set_variable = { name = eco_soil_health value = eco_seed_soil_start }
+		set_variable = { name = eco_temp_current value = eco_monthly_temperature }
+		set_variable = { name = eco_moisture value = eco_moisture_index }
+		# 3b. phenology regime + initial state (needs eco_temp_current)
+		eco_seed_phenology = yes
+		# 4. permanent display/capacity carriers (no duration = permanent).
+		# size = <script value> is the vanilla-proven dynamic-strength pattern
+		# (societal_value_push_* in vanilla country_effects.txt); the monthly tick
+		# re-applies them with mode = replace to refresh the size.
+		add_province_modifier = { modifier = eco_metric_temperature mode = replace size = eco_temperature_display }
+		add_province_modifier = { modifier = eco_metric_gdd mode = replace size = eco_gdd_display }
+		add_province_modifier = { modifier = eco_metric_humidity mode = replace size = eco_humidity_display }
+		add_province_modifier = { modifier = eco_metric_soil_health mode = replace size = eco_soil_display }
+		add_province_modifier = { modifier = eco_soil_capacity mode = replace size = eco_soil_capacity_delta }
+		add_province_modifier = { modifier = eco_metric_erosion mode = replace size = eco_erosion_display }
+	}
+}
+
+# Phenology seeding. Runs at game start (from eco_seed_province) and from the tick's
+# save-upgrade guard for provinces seeded before the phenology update.
+eco_seed_phenology = {
+	set_variable = { name = eco_regime value = eco_seed_regime }
+	set_variable = { name = eco_growth_months_elapsed value = 0 }
+	set_variable = { name = eco_had_freeze value = 0 }
+	# initial state: perpetual for equatorial, active if already warm, dormant otherwise
+	if = {
+		limit = { var:eco_regime = 4 }
+		set_variable = { name = eco_phenology_state value = 3 }
+	}
+	else_if = {
+		limit = { var:eco_temp_current >= 5 }
+		set_variable = { name = eco_phenology_state value = 1 }
+	}
+	else = {
+		set_variable = { name = eco_phenology_state value = 0 }
+	}
+	add_province_modifier = { modifier = eco_metric_phenology mode = replace size = eco_phenology_display }
+	add_province_modifier = { modifier = eco_metric_regime mode = replace size = eco_regime_display }
+	add_province_modifier = { modifier = eco_metric_elapsed mode = replace size = eco_elapsed_display }
+}

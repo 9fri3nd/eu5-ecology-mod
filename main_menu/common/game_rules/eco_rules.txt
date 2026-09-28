@@ -1,0 +1,20 @@
+﻿eco_rule = {
+	default = eco_rule_enabled
+	eco_rule_enabled = {
+		flag = general_rule
+	}
+	eco_rule_disabled = {
+		flag = general_rule
+	}
+}
+
+# Observer-mode benchmark logger: CSV lines to game.log for 16 target provinces every Jan/Jul
+eco_benchmark_rule = {
+	default = eco_benchmark_enabled
+	eco_benchmark_enabled = {
+		flag = general_rule
+	}
+	eco_benchmark_disabled = {
+		flag = general_rule
+	}
+}

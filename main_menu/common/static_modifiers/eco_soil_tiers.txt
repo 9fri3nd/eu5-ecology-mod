@@ -1,0 +1,43 @@
+﻿# Soil health tiers: applied mutually exclusively based on eco_tier_soil.
+eco_soil_tier_depleted = {
+	game_data = {
+		category = province
+	}
+	eco_soil_tier = 0
+	local_raw_material_output = -0.25
+	local_population_capacity_modifier = -0.10
+}
+
+eco_soil_tier_poor = {
+	game_data = {
+		category = province
+	}
+	eco_soil_tier = 1
+	local_raw_material_output = -0.15
+	local_population_capacity_modifier = -0.05
+}
+
+eco_soil_tier_degraded = {
+	game_data = {
+		category = province
+	}
+	eco_soil_tier = 2
+	local_raw_material_output = -0.05
+}
+
+eco_soil_tier_healthy = {
+	game_data = {
+		category = province
+	}
+	eco_soil_tier = 3
+	local_raw_material_output = 0.05
+}
+
+eco_soil_tier_rich = {
+	game_data = {
+		category = province
+	}
+	eco_soil_tier = 4
+	local_raw_material_output = 0.10
+	local_population_capacity_modifier = 0.05
+}

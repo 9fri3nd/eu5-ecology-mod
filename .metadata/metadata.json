@@ -1,0 +1,11 @@
+{
+	"name":	"Ecology Simulation",
+	"id":	"",
+	"version":	"0.1.0",
+	"supported_game_version":	"1.3.11",
+	"short_description":	"Per-province ecology simulation: temperature, humidity, growing degree days (GDD) and soil erosion. Monthly pulse, province-level state, effects cascade to locations.",
+	"tags":	["Gameplay", "Balance"],
+	"relationships":	[],
+	"game_custom_data":	{
+	}
+}
