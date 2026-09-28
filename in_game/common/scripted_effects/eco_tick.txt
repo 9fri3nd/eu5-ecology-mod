@@ -72,22 +72,52 @@ eco_tick_province = {
 	# clamp_variable with a script-value bound silently fails (confirmed: negative soil in saves);
 	# clamp via a capped script value instead
 	set_variable = { name = eco_soil_health value = eco_soil_health_capped }
-	# Continuous carriers: re-applied monthly with mode = replace + size = <script value>,
+	# Continuous carriers: re-applied with mode = replace + size = <script value>,
 	# the vanilla-proven dynamic-strength pattern (societal_value_push_*). Do NOT use
 	# change_province_modifier_size here: vanilla never calls it and it left sizes stuck at 1.
-	add_province_modifier = { modifier = eco_metric_temperature mode = replace size = eco_temperature_display }
-	add_province_modifier = { modifier = eco_metric_gdd mode = replace size = eco_gdd_display }
-	add_province_modifier = { modifier = eco_metric_humidity mode = replace size = eco_humidity_display }
-	add_province_modifier = { modifier = eco_metric_soil_health mode = replace size = eco_soil_display }
-	add_province_modifier = { modifier = eco_soil_capacity mode = replace size = eco_soil_capacity_delta }
-	add_province_modifier = { modifier = eco_metric_erosion mode = replace size = eco_erosion_display }
-	add_province_modifier = { modifier = eco_metric_phenology mode = replace size = eco_phenology_display }
-	add_province_modifier = { modifier = eco_metric_regime mode = replace size = eco_regime_display }
-	add_province_modifier = { modifier = eco_metric_elapsed mode = replace size = eco_elapsed_display }
+	# eco_refresh_carrier skips the re-apply when the size did not change.
+	eco_refresh_all_carriers = yes
 	eco_update_gdd_tier = yes
 	eco_update_soil_tier = yes
 	eco_update_humidity_tier = yes
 	eco_update_temp_tier = yes
+}
+
+# Re-applies one display carrier only when its size changed. A re-apply marks the
+# modifiers of every location in the province for recalculation, so unchanged sizes
+# (regime, humidity outside its seasonal rows, soil near its equilibrium, GDD during
+# dormancy) are skipped. The last applied size is kept in the variable SHOWN.
+eco_refresh_carrier = {
+	save_temporary_scope_value_as = {
+		name = eco_carrier_size
+		value = $VALUE$
+	}
+	# -9999 never matches a real size: forces the first apply (new provinces, old saves)
+	if = {
+		limit = {
+			NOT = { has_variable = $SHOWN$ }
+		}
+		set_variable = { name = $SHOWN$ value = -9999 }
+	}
+	if = {
+		limit = {
+			NOT = { var:$SHOWN$ = scope:eco_carrier_size }
+		}
+		add_province_modifier = { modifier = $MODIFIER$ mode = replace size = $VALUE$ }
+		set_variable = { name = $SHOWN$ value = scope:eco_carrier_size }
+	}
+}
+
+eco_refresh_all_carriers = {
+	eco_refresh_carrier = { MODIFIER = eco_metric_temperature SHOWN = eco_shown_temperature VALUE = eco_temperature_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_gdd SHOWN = eco_shown_gdd VALUE = eco_gdd_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_humidity SHOWN = eco_shown_humidity VALUE = eco_humidity_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_soil_health SHOWN = eco_shown_soil VALUE = eco_soil_display }
+	eco_refresh_carrier = { MODIFIER = eco_soil_capacity SHOWN = eco_shown_soil_capacity VALUE = eco_soil_capacity_delta }
+	eco_refresh_carrier = { MODIFIER = eco_metric_erosion SHOWN = eco_shown_erosion VALUE = eco_erosion_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_phenology SHOWN = eco_shown_phenology VALUE = eco_phenology_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_regime SHOWN = eco_shown_regime VALUE = eco_regime_display }
+	eco_refresh_carrier = { MODIFIER = eco_metric_elapsed SHOWN = eco_shown_elapsed VALUE = eco_elapsed_display }
 }
 
 eco_update_gdd_tier = {

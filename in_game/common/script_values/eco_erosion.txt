@@ -27,6 +27,10 @@ eco_erosion_monthly = {
 	# at 0.2 (Paris 81->0, Palermo 76->0); 0.02 makes it a generational dynamic while
 	# over-pressured tropical farmland still degrades slowly
 	multiply = 0.02
+	# erosion removes a share of the soil that is there, and regeneration slows as soil
+	# nears its maximum, so each province settles at soil_max * regen / (regen + erosion)
+	# instead of running to 0 (erosion > regen) or to soil_max (erosion < regen)
+	multiply = eco_soil_fraction
 	min = 0
 }
 
@@ -34,12 +38,26 @@ eco_soil_regen_monthly = {
 	desc = "ECO_SV_REGEN"
 	value = 0.4
 	multiply = var:eco_veg_cover
+	multiply = {
+		value = 1
+		subtract = eco_soil_fraction
+	}
 }
 
+# current soil health as a share of the province's maximum (0..1)
+eco_soil_fraction = {
+	value = var:eco_soil_health
+	divide = var:eco_soil_max
+	min = 0
+	max = 1
+}
+
+# whole food units, so the carrier is only re-applied when the capacity actually moves
 eco_soil_capacity_delta = {
 	value = var:eco_soil_health
 	subtract = 50
 	multiply = 0.8
+	round = yes
 }
 
 eco_soil_max_sv = {

@@ -244,9 +244,11 @@ eco_seed_regime = {
 		limit = { capital ?= { climate = tropical } }
 		value = 3
 	}
-	# equatorial: tropical AND warm year-round (monthly temperature never near 20 C)
+	# equatorial: tropical rainforest (jungle). eco_temp_mean is 27 for every tropical
+	# province, so a temperature test would put all of them here and leave the monsoon
+	# regime unreachable; tropical forest, woods and grassland keep the monsoon cycle.
 	if = {
-		limit = { capital ?= { climate = tropical } var:eco_temp_mean >= 24 }
+		limit = { capital ?= { climate = tropical vegetation = jungle } }
 		value = 4
 	}
 }

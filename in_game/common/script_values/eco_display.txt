@@ -22,10 +22,13 @@ eco_soil_display = {
 	round = yes
 }
 
-# annualized erosion rate for display (monthly rate x 12)
+# annualized erosion rate for display (monthly rate x 12), rounded to the 1 decimal the
+# modifier type shows so the carrier is only re-applied when the readout changes
 eco_erosion_display = {
 	value = var:eco_erosion_rate
-	multiply = 12
+	multiply = 120
+	round = yes
+	divide = 10
 }
 
 eco_phenology_display = {

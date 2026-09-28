@@ -3,7 +3,6 @@
 	subtract = 4
 	min = 0
 	multiply = 30
-	multiply = var:eco_growing_season
 	multiply = eco_gdd_season_factor
 }
 
@@ -12,7 +11,6 @@ eco_gdd_monthly_rice = {
 	subtract = 10
 	min = 0
 	multiply = 30
-	multiply = var:eco_growing_season
 	multiply = eco_gdd_season_factor
 }
 
@@ -21,7 +19,6 @@ eco_gdd_monthly_maize = {
 	subtract = 8
 	min = 0
 	multiply = 30
-	multiply = var:eco_growing_season
 	multiply = eco_gdd_season_factor
 }
 
@@ -30,7 +27,6 @@ eco_gdd_monthly_millet = {
 	subtract = 8
 	min = 0
 	multiply = 30
-	multiply = var:eco_growing_season
 	multiply = eco_gdd_season_factor
 }
 
@@ -39,7 +35,6 @@ eco_gdd_monthly_potato = {
 	subtract = 5
 	min = 0
 	multiply = 30
-	multiply = var:eco_growing_season
 	multiply = eco_gdd_season_factor
 }
 
@@ -89,6 +84,8 @@ eco_gdd_fulfillment = {
 
 # State-driven growth factor (phenology state machine): dormant provinces do not grow,
 # fallow/drought provinces stall to a trickle. Replaces the old Mediterranean calendar rows.
+# This is the only state gate on GDD: multiplying by eco_growing_season as well (0 in
+# fallow) would zero the fallow trickle.
 eco_gdd_season_factor = {
 	value = 1
 	if = {

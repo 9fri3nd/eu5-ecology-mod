@@ -57,13 +57,8 @@ eco_seed_province = {
 		# 4. permanent display/capacity carriers (no duration = permanent).
 		# size = <script value> is the vanilla-proven dynamic-strength pattern
 		# (societal_value_push_* in vanilla country_effects.txt); the monthly tick
-		# re-applies them with mode = replace to refresh the size.
-		add_province_modifier = { modifier = eco_metric_temperature mode = replace size = eco_temperature_display }
-		add_province_modifier = { modifier = eco_metric_gdd mode = replace size = eco_gdd_display }
-		add_province_modifier = { modifier = eco_metric_humidity mode = replace size = eco_humidity_display }
-		add_province_modifier = { modifier = eco_metric_soil_health mode = replace size = eco_soil_display }
-		add_province_modifier = { modifier = eco_soil_capacity mode = replace size = eco_soil_capacity_delta }
-		add_province_modifier = { modifier = eco_metric_erosion mode = replace size = eco_erosion_display }
+		# re-applies them with mode = replace whenever the size changes.
+		eco_refresh_all_carriers = yes
 	}
 }
 
@@ -85,7 +80,5 @@ eco_seed_phenology = {
 	else = {
 		set_variable = { name = eco_phenology_state value = 0 }
 	}
-	add_province_modifier = { modifier = eco_metric_phenology mode = replace size = eco_phenology_display }
-	add_province_modifier = { modifier = eco_metric_regime mode = replace size = eco_regime_display }
-	add_province_modifier = { modifier = eco_metric_elapsed mode = replace size = eco_elapsed_display }
+	# carriers: applied by eco_seed_province step 4 or by the tick that called this
 }
